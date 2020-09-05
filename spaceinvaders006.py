@@ -59,30 +59,35 @@ class Alien(pygame.sprite.Sprite):
 
     def update(self):
         global direz
-
         # The frame is changed every 3 frames at 0.33
-        if notself.frame_cnt > len(self.frames):
-            self.frame_cnt += .03
-        else:
+        self.frame_cnt += .03
+        if self.frame_cnt > len(self.frames):
             self.frame_cnt = 0
+        # They all go right or left together
         self.rect.left += direz # + int(1 / len(aliens))
+        # updates the image of the sprite every  3 frames (0.3 * 3)
         self.image = self.frames[int(self.frame_cnt)]
-        self.collide()
 
-    def collide(self):
-        global direz
 
-        if self.rect.colliderect(ship):
+def collisions():
+    global direz, godown
+
+    for alien in aliens:
+        if alien.rect.colliderect(ship):
             direz = 0
             godown = 0
-            self.gameover()
+            gameover()
 
-    def gameover(self):
-        text = write("GAME OVER")
-        text_rect = text.get_rect() 
-        text_rect.center = w // 2, h // 2
-        # rect = pygame.Rect(w, h, rect)
-        screen.blit(write("GAME OVER"), text_rect)
+
+def gameover():
+    text = write("GAME OVER")
+    text_rect = text.get_rect() 
+    text_rect.center = w // 2, h // 2
+    # rect = pygame.Rect(w, h, rect)
+    g = pygame.sprite.Group()
+    aliens = pygame.sprite.Group()
+    screen.fill((0, 0, 0))
+    screen.blit(write("GAME OVER"), text_rect)
 
 
 font = pygame.font.SysFont("Arial", 36)
@@ -125,7 +130,7 @@ while loop:
         # direz = 0
         cnt += 1
         for alien in aliens:
-            alien.rect.top += 1
+            alien.rect.top += 3
 
         direz = 0
         if cnt == 30:
@@ -159,6 +164,7 @@ while loop:
     screen.fill((0, 0, 0))
     g.draw(screen)
     aliens.update()
+    collisions()
 
     for alien in aliens:
         if alien.rect.right > 500:
